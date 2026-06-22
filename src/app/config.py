@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     vllm_base_url: str = "http://localhost:8000/v1"
     vllm_model: str = ""
 
+    pdf_max_concurrency: int = 3
+
     max_upload_size_mb: int = 20
     log_level: str = "INFO"
 
