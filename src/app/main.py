@@ -26,6 +26,18 @@ def create_llm_service(settings: Settings) -> BaseLLMService:
             api_key=settings.openai_api_key,
             model=settings.openai_model,
         )
+    elif settings.llm_provider == LLMProvider.OLLAMA:
+        return OpenAILLMService(
+            api_key="ollama",
+            model=settings.ollama_model,
+            base_url=settings.ollama_base_url,
+        )
+    elif settings.llm_provider == LLMProvider.VLLM:
+        return OpenAILLMService(
+            api_key="vllm",
+            model=settings.vllm_model,
+            base_url=settings.vllm_base_url,
+        )
     else:
         raise ValueError(f"Unknown LLM provider: {settings.llm_provider}")
 
