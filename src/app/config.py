@@ -6,6 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class LLMProvider(str, Enum):
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
+    OLLAMA = "ollama"
+    VLLM = "vllm"
 
 
 class Settings(BaseSettings):
@@ -18,6 +20,12 @@ class Settings(BaseSettings):
 
     openai_api_key: str = ""
     openai_model: str = "gpt-4o"
+
+    ollama_base_url: str = "http://localhost:11434/v1"
+    ollama_model: str = "llava"
+
+    vllm_base_url: str = "http://localhost:8000/v1"
+    vllm_model: str = ""
 
     max_upload_size_mb: int = 20
     log_level: str = "INFO"

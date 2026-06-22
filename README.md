@@ -17,6 +17,8 @@ LLM を内部利用したファイルテキストパーサー API。
 | 画像処理 | Pillow | PDF ページの画像レンダリング |
 | LLM (Anthropic) | anthropic SDK | Claude によるマルチモーダル解析 |
 | LLM (OpenAI) | openai SDK | GPT-4o によるマルチモーダル解析 |
+| LLM (Ollama) | openai SDK (互換API) | ローカル LLM (LLaVA 等) |
+| LLM (vLLM) | openai SDK (互換API) | セルフホスト LLM サーバー |
 | 設定管理 | pydantic-settings | 環境変数ベースの設定 |
 
 ## セットアップ
@@ -37,11 +39,15 @@ uv run uvicorn app.main:app --reload
 
 | 変数名 | 説明 | デフォルト |
 |--------|------|-----------|
-| `APP_LLM_PROVIDER` | 使用する LLM プロバイダー (`anthropic` or `openai`) | `anthropic` |
+| `APP_LLM_PROVIDER` | LLM プロバイダー (`anthropic`, `openai`, `ollama`, `vllm`) | `anthropic` |
 | `APP_ANTHROPIC_API_KEY` | Anthropic API キー | - |
 | `APP_ANTHROPIC_MODEL` | Claude モデル名 | `claude-sonnet-4-20250514` |
 | `APP_OPENAI_API_KEY` | OpenAI API キー | - |
 | `APP_OPENAI_MODEL` | OpenAI モデル名 | `gpt-4o` |
+| `APP_OLLAMA_BASE_URL` | Ollama サーバー URL | `http://localhost:11434/v1` |
+| `APP_OLLAMA_MODEL` | Ollama モデル名 | `llava` |
+| `APP_VLLM_BASE_URL` | vLLM サーバー URL | `http://localhost:8000/v1` |
+| `APP_VLLM_MODEL` | vLLM モデル名 | - |
 | `APP_MAX_UPLOAD_SIZE_MB` | アップロード上限 (MB) | `20` |
 | `APP_LOG_LEVEL` | ログレベル | `INFO` |
 
@@ -168,8 +174,40 @@ src/app/
 
 ### LLM プロバイダー切替
 
-`APP_LLM_PROVIDER` 環境変数で Anthropic / OpenAI を切り替え可能。
+`APP_LLM_PROVIDER` 環境変数で切り替え可能。
+
+| プロバイダー | 説明 | API キー要否 |
+|---|---|---|
+| `anthropic` | Anthropic Claude API | 要 |
+| `openai` | OpenAI API | 要 |
+| `ollama` | ローカル Ollama サーバー (OpenAI 互換 API) | 不要 |
+| `vllm` | vLLM サーバー (OpenAI 互換 API) | 不要 |
+
+Ollama / vLLM は OpenAI 互換エンドポイントを利用するため、追加の SDK 依存はなし。
 `BaseLLMService` ABC を実装する形で、新しいプロバイダーも追加できる。
+
+#### Ollama での利用例
+
+```bash
+# Ollama でマルチモーダルモデルを起動
+ollama pull llava
+ollama serve
+
+# .env 設定
+APP_LLM_PROVIDER=ollama
+APP_OLLAMA_MODEL=llava
+```
+
+#### vLLM での利用例
+
+```bash
+# vLLM でマルチモーダルモデルを起動
+vllm serve llava-hf/llava-1.5-7b-hf
+
+# .env 設定
+APP_LLM_PROVIDER=vllm
+APP_VLLM_MODEL=llava-hf/llava-1.5-7b-hf
+```
 
 ## 新しいファイル形式の追加方法
 
