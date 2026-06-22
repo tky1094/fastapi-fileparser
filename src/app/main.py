@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     registry = ParserRegistry()
     registry.register(TextParser())
     registry.register(ImageParser(llm_service))
-    registry.register(PdfParser(llm_service))
+    registry.register(PdfParser(llm_service, max_concurrency=settings.pdf_max_concurrency))
     registry.register(DocxParser())
 
     app.state.settings = settings
